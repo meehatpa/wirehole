@@ -1,4 +1,4 @@
-version: "3"
+version: "3.9"
 
 networks:
   private_network:
@@ -84,11 +84,12 @@ services:
         ipv4_address: 10.2.0.100
 
   frigate:
-    depends_on: [mosquitto]
+    #depends_on: [mosquitto]
     container_name: frigate
     # privileged: true # this may not be necessary for all setups
     restart: unless-stopped
-    image: blakeblackshear/frigate:stable
+    # image: blakeblackshear/frigate:stable
+    image: ghcr.io/blakeblackshear/frigate:stable
     shm_size: "64mb" # update for your cameras based on calculation above
     #devices:
     #  - /dev/bus/usb:/dev/bus/usb # passes the USB Coral, needs to be modified for other versions
@@ -105,7 +106,9 @@ services:
           size: 1000000000
     ports:
       - "5000:5000"
-      - "1935:1935" # RTMP feeds
+      - "8554:8554" # RTSP feeds
+      - "8555:8555/tcp" # WebRTC over tcp
+      - "8555:8555/udp" # WebRTC over udp
     environment:
       FRIGATE_RTSP_PASSWORD: "password"
     networks:
@@ -114,17 +117,17 @@ services:
     cap_add:
       - NET_ADMIN
 
-  mosquitto:
-    container_name: mosquitto
-    restart: unless-stopped
-    image: eclipse-mosquitto:2
-    volumes:
-      - ./mosquitto/config/:/mosquitto/config/:ro
-      - ./mosquitto/log/:/mosquitto/log/
-      - ./mosquitto/data:/mosquitto/data/
-    ports:
-      - 1883:1883
-      - 9001:9001
-    networks:
-      private_network:
-        ipv4_address: 10.2.0.202
+#   mosquitto:
+#     container_name: mosquitto
+#     restart: unless-stopped
+#     image: eclipse-mosquitto:2
+#     volumes:
+#       - ./mosquitto/config/:/mosquitto/config/:ro
+#       - ./mosquitto/log/:/mosquitto/log/
+#       - ./mosquitto/data:/mosquitto/data/
+#     ports:
+#       - 1883:1883
+#       - 9001:9001
+#     networks:
+#       private_network:
+#         ipv4_address: 10.2.0.202

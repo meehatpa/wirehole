@@ -1,25 +1,39 @@
 logger:
   default: error
+
 mqtt:
-  host: 10.2.0.202
+  enabled: False
+
+detectors:
+  cpu:
+    type: cpu
+    num_threads: 4
+
 cameras:
-  back:
+  SB307:
     ffmpeg:
       input_args: -rtsp_transport http
       output_args:
         record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c:v copy -c:a aac
       inputs:
-        - path: rtsp://admin:{FRIGATE_RTSP_PASSWORD}@10.6.0.30:8080/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif
+        - path: rtsp://admin:{FRIGATE_RTSP_PASSWORD}@192.168.5.230:80/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif
           roles:
             - record
             - rtmp
-        - path: rtsp://admin:{FRIGATE_RTSP_PASSWORD}@10.6.0.30:8080/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif
+        - path: rtsp://admin:{FRIGATE_RTSP_PASSWORD}@192.168.5.230:80/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif
           roles:
             - detect
     rtmp:
       enabled: False
+    detect:
+      enabled: True
+
 record:
   enabled: True
   retain:
-    days: 2
+    days: 3
     mode: motion
+  events:
+    retain:
+      default: 7
+      mode: active_objects
